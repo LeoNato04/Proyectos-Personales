@@ -1,0 +1,104 @@
+# Este programa grafica la solución exacta y usando el Método de Heun (con sus respectivos errores) para comparar cuál es la más exacta
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Definimos dy/dt = f(t, y)
+def f(t, y):
+    return -2 * t * y 
+
+def exact_sol(t):
+    return np.exp(-t**2) # Acá cambiamos la función
+
+# Método de Heun
+def heun(a, b, y1, N):
+    h = (b - a) / N
+    t = np.linspace(a, b, N + 1)
+    y = np.zeros(N + 1)
+    y[0] = y1
+    for k in range(N):
+        t_k = t[k]
+        y_k = y[k]
+        
+        k1 = h * f(t_k, y_k) 
+        y_star = y_k + k1
+        k2 = h * f(t_k + h, y_star)
+        
+        y[k + 1] = y_k + (k1 + k2) / 2
+    return t, y
+
+# Método de Runge-Kutta
+def runge_kutta(a, b, y1, N):
+    h = (b - a) / N
+    t = np.linspace(a, b, N + 1)
+    y = np.zeros(N + 1)
+    y[0] = y1
+
+    for k in range(N):
+        t_k = t[k]
+        y_k = y[k]
+
+        k1 = h * f(t_k, y_k)
+        k2 = h * f(t_k + h / 2, y_k + k1 / 2)
+        k3 = h * f(t_k + h / 2, y_k + k2 / 2)
+        k4 = h * f(t_k + h, y_k + k3)
+
+        y[k + 1] = y_k + (k1 + 2 * k2 + 2 * k3 + k4) / 6
+    return t, y
+
+# Parámetros
+a = 0
+b = 2
+y1 = 1
+N = 20
+
+# Aplicamos ambos métodos
+t_heun, y_heun = heun(a, b, y1, N)
+t_rk4, y_rk4 = runge_kutta(a, b, y1, N)
+
+y_exact = exact_sol(t_heun)
+
+error_heun_abs = np.abs(y_exact - y_heun)
+error_rk4_abs = np.abs(y_exact - y_rk4)
+error_heun_rel = np.abs((y_exact - y_heun) / y_exact)
+error_rk4_rel = np.abs((y_exact - y_rk4) / y_exact)
+
+# Configuración de los subplots
+fig, axs = plt.subplots(2, 2, figsize=(10, 8))
+
+# Gráfico de las soluciones numéricas y exacta
+axs[0, 0].plot(t_heun, y_heun, label='Heun', linestyle='--', color='blue')
+axs[0, 0].plot(t_rk4, y_rk4, label='RK4', color='green')
+axs[0, 0].plot(t_heun, y_exact, label='Solución Exacta', color='red', linestyle='-.')
+axs[0, 0].set_xlabel('t')
+axs[0, 0].set_ylabel('y(t)')
+axs[0, 0].set_title('Solución Exacta vs Heun y RK4')
+axs[0, 0].legend()
+axs[0, 0].grid(True)
+
+# Gráfico del error absoluto
+axs[0, 1].plot(t_heun, error_heun_abs, label='Error Absoluto Heun', linestyle='--', color='blue')
+axs[0, 1].plot(t_rk4, error_rk4_abs, label='Error Absoluto RK4', color='green')
+axs[0, 1].set_xlabel('t')
+axs[0, 1].set_ylabel('Error Absoluto')
+axs[0, 1].set_title('Error Absoluto')
+axs[0, 1].legend()
+axs[0, 1].grid(True)
+
+# Gráfico del error relativo de Heun
+axs[1, 0].plot(t_heun, error_heun_rel, label='Error Relativo Heun', linestyle='--', color='blue')
+axs[1, 0].set_xlabel('t')
+axs[1, 0].set_ylabel('Error Relativo')
+axs[1, 0].set_title('Error Relativo de Heun')
+axs[1, 0].legend()
+axs[1, 0].grid(True)
+
+# Gráfico del error relativo de RK4
+axs[1, 1].plot(t_rk4, error_rk4_rel, label='Error Relativo RK4', color='green')
+axs[1, 1].set_xlabel('t')
+axs[1, 1].set_ylabel('Error Relativo')
+axs[1, 1].set_title('Error Relativo de RK4')
+axs[1, 1].legend()
+axs[1, 1].grid(True)
+plt.tight_layout()
+plt.show()
