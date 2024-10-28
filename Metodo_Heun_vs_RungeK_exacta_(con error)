@@ -16,6 +16,7 @@ def heun(a, b, y1, N):
     t = np.linspace(a, b, N + 1)
     y = np.zeros(N + 1)
     y[0] = y1
+
     for k in range(N):
         t_k = t[k]
         y_k = y[k]
@@ -25,6 +26,7 @@ def heun(a, b, y1, N):
         k2 = h * f(t_k + h, y_star)
         
         y[k + 1] = y_k + (k1 + k2) / 2
+
     return t, y
 
 # Método de Runge-Kutta
@@ -44,6 +46,7 @@ def runge_kutta(a, b, y1, N):
         k4 = h * f(t_k + h, y_k + k3)
 
         y[k + 1] = y_k + (k1 + 2 * k2 + 2 * k3 + k4) / 6
+
     return t, y
 
 # Parámetros
