@@ -1,4 +1,4 @@
-# Este programa grafica la solución exacta y usando el Método de Heun (con sus respectivos errores) para comparar cuál es la más exacta
+# Este programa grafica la solución exacta y usando el Método de Heun y Runge-K (con sus respectivos errores) para comparar cuál es la más exacta
 
 import numpy as np
 import matplotlib.pyplot as plt
