@@ -1,0 +1,87 @@
+# Este programa grafica la solución exacta y usando el Método de Heun (con sus respectivos errores) para comparar cuál es la más exacta
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Definimos dy/dt = f(t, y)
+def f(t, y):
+    return -2 * t * y
+
+def exact_solution(t):
+    return np.exp(-t**2)
+
+def heun(a, b, y1, N):
+    h = (b - a) / N
+    t = np.linspace(a, b, N + 1)
+    y = np.zeros(N + 1) 
+    y[0] = y1 
+
+    y_prima_list = []
+
+    for k in range(N):
+        t_k = t[k]
+        y_k = y[k]
+        
+        k1 = h * f(t_k, y_k)
+        y_prima = y_k + k1
+
+        k2 = h * f(t_k + h, y_prima) 
+
+        y[k + 1] = y_k + (k1 + k2) / 2
+        y_prima_list.append(y_prima)
+
+    return t, y, y_prima_list
+
+# Parámetros
+a = 0
+b = 2
+y1 = 1
+N = 20
+
+# Ejecutar el método de Heun y obtener la solución exacta
+t, y, y_prima = heun(a, b, y1, N)
+y_exact = exact_solution(t)
+
+# Calcular errores
+error_heun_abs = np.abs(y - y_exact)
+error_heun_rel = np.abs((y - y_exact) / y_exact)
+
+# Configuración de los subplots
+fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+
+# Gráfico de la solución numérica y derivada
+axs[0, 0].plot(t, y, label='y(t) - Aproximación Heun', linestyle='--', color='blue')
+axs[0, 0].plot(t[:-1], y_prima, label='y*(t) - Derivada', linestyle='--', color='orange')
+axs[0, 0].set_xlabel('t')
+axs[0, 0].set_ylabel('y(t)')
+axs[0, 0].set_title('Solución y derivada usando el método de Heun')
+axs[0, 0].legend()
+axs[0, 0].grid(True)
+
+# Gráfico del error absoluto de Heun
+axs[0, 1].plot(t, error_heun_abs, label='Error Absoluto Heun', linestyle='--', color='blue')
+axs[0, 1].set_xlabel('t')
+axs[0, 1].set_ylabel('Error Absoluto')
+axs[0, 1].set_title('Error Absoluto de Heun')
+axs[0, 1].legend()
+axs[0, 1].grid(True)
+
+# Gráfico del error relativo de Heun
+axs[1, 0].plot(t, error_heun_rel, label='Error Relativo Heun', linestyle='--', color='blue')
+axs[1, 0].set_xlabel('t')
+axs[1, 0].set_ylabel('Error Relativo')
+axs[1, 0].set_title('Error Relativo de Heun')
+axs[1, 0].legend()
+axs[1, 0].grid(True)
+
+# Gráfico de la solución exacta vs aproximación
+axs[1, 1].plot(t, y, label='Heun', linestyle='--', color='blue')
+axs[1, 1].plot(t, y_exact, label='Solución Exacta', color='green')
+axs[1, 1].set_xlabel('t')
+axs[1, 1].set_ylabel('y(t)')
+axs[1, 1].set_title('Comparación de la Solución Exacta y Aproximación de Heun')
+axs[1, 1].legend()
+axs[1, 1].grid(True)
+
+plt.tight_layout()
+plt.show()
